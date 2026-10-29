@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostureFix & Fitness Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        teal: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            900: '#134e4a',
+                        },
+                        coral: {
+                            500: '#ff6b6b',
+                            600: '#ee5253',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .tab-active {
+            color: #0d9488;
+            border-bottom: 3px solid #0d9488;
+            font-weight: 700;
+        }
+
+        /* Avatar Animation Keyframes */
+        @keyframes avatar-chin-tuck {
+            0%, 100% { transform: translate(0px, 0px); }
+            50% { transform: translate(-12px, 3px); }
+        }
+        @keyframes avatar-wall-angels {
+            0%, 100% { transform: translateY(18px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(-10deg); }
+        }
+        @keyframes avatar-transverse-pulse {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.82); }
+        }
+        @keyframes avatar-thoracic-arch {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(-14deg); }
+        }
+        @keyframes avatar-bird-dog-arm {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(-45deg); }
+        }
+        @keyframes avatar-bird-dog-leg {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(35deg); }
+        }
+        @keyframes avatar-bridge-pelvis {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-28px); }
+        }
+
+        .anim-chin-head { animation: avatar-chin-tuck 3s infinite ease-in-out; transform-origin: center; }
+        .anim-wall-arms { animation: avatar-wall-angels 2.5s infinite ease-in-out; transform-origin: 100px 75px; }
+        .anim-transverse { animation: avatar-transverse-pulse 2s infinite ease-in-out; transform-origin: center; }
+        .anim-thoracic-spine { animation: avatar-thoracic-arch 3s infinite ease-in-out; transform-origin: 100px 90px; }
+        .anim-bd-arm { animation: avatar-bird-dog-arm 3s infinite ease-in-out; transform-origin: 75px 65px; }
+        .anim-bd-leg { animation: avatar-bird-dog-leg 3s infinite ease-in-out; transform-origin: 125px 65px; }
+        .anim-bridge-pelvis { animation: avatar-bridge-pelvis 2.8s infinite ease-in-out; transform-origin: center; }
+
+        /* Pulse muscle highlight */
+        @keyframes pulse-muscle {
+            0%, 100% { opacity: 0.9; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.15); }
+        }
+        .animate-muscle {
+            animation: pulse-muscle 1.8s infinite ease-in-out;
+            transform-origin: center;
+        }
+
+        @keyframes move-guide {
+            0% { stroke-dashoffset: 20; }
+            100% { stroke-dashoffset: 0; }
+        }
+        .motion-guide {
+            stroke-dasharray: 6 4;
+            animation: move-guide 1.5s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-600 to-teal-400 flex items-center justify-center text-white shadow-md shadow-teal-500/20">
+                        <i class="fa-solid font-bold fa-child-reaching text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-teal-700 to-teal-500 bg-clip-text text-transparent">PostureFix</span>
+                        <span class="text-xs font-semibold tracking-wider text-slate-400 block -mt-1 uppercase">Studio & Postura</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden md:flex space-x-6">
+                    <button id="nav-dashboard" onclick="switchTab('dashboard')" class="text-slate-600 hover:text-teal-600 px-1 py-4 text-sm font-medium flex items-center space-x-2 transition">
+                        <i class="fa-solid fa-house"></i> <span>Mi Panel</span>
+                    </button>
+                    <button id="nav-exercises" onclick="switchTab('exercises')" class="text-slate-600 hover:text-teal-600 px-1 py-4 text-sm font-medium flex items-center space-x-2 transition">
+                        <i class="fa-solid fa-dumbbell"></i> <span>Ejercicios</span>
+                    </button>
+                    <button id="nav-calendar" onclick="switchTab('calendar')" class="text-slate-600 hover:text-teal-600 px-1 py-4 text-sm font-medium flex items-center space-x-2 transition">
+                        <i class="fa-solid fa-calendar-days"></i> <span>Plan Semanal</span>
+                    </button>
+                    <button id="nav-achievements" onclick="switchTab('achievements')" class="text-slate-600 hover:text-teal-600 px-1 py-4 text-sm font-medium flex items-center space-x-2 transition">
+                        <i class="fa-solid fa-award text-amber-500"></i> <span>Recompensas</span>
+                    </button>
+                    <button id="nav-profile" onclick="switchTab('profile')" class="text-slate-600 hover:text-teal-600 px-1 py-4 text-sm font-medium flex items-center space-x-2 transition">
+                        <i class="fa-solid fa-user-gear"></i> <span>Mi Perfil</span>
+                    </button>
+                </nav>
+
+                <!-- Profile Brief Badge & Streak -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-amber-50 border border-amber-200 text-amber-700 px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5 shadow-sm cursor-pointer" onclick="switchTab('achievements')">
+                        <i class="fa-solid fa-fire text-amber-500 text-sm"></i>
+                        <span id="header-streak-count">3 Días</span>
+                    </div>
+                    <button onclick="switchTab('profile')" class="flex items-center space-x-2 p-1.5 rounded-full hover:bg-slate-100 transition border border-slate-200">
+                        <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-700 font-bold flex items-center justify-center text-sm" id="user-avatar-initials">
+                            PF
+                        </div>
+                        <span class="text-xs font-semibold text-slate-700 pr-2 hidden sm:inline" id="user-display-name">Usuario</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Bottom Nav -->
+        <div class="md:hidden flex justify-around bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-40 py-2">
+            <button onclick="switchTab('dashboard')" class="flex flex-col items-center text-slate-600 text-xs py-1">
+                <i class="fa-solid fa-house text-lg"></i><span>Inicio</span>
+            </button>
+            <button onclick="switchTab('exercises')" class="flex flex-col items-center text-slate-600 text-xs py-1">
+                <i class="fa-solid fa-dumbbell text-lg"></i><span>Ejercicios</span>
+            </button>
+            <button onclick="switchTab('calendar')" class="flex flex-col items-center text-slate-600 text-xs py-1">
+                <i class="fa-solid fa-calendar-days text-lg"></i><span>Plan</span>
+            </button>
+            <button onclick="switchTab('achievements')" class="flex flex-col items-center text-slate-600 text-xs py-1">
+                <i class="fa-solid fa-award text-lg text-amber-500"></i><span>Logros</span>
+            </button>
+            <button onclick="switchTab('profile')" class="flex flex-col items-center text-slate-600 text-xs py-1">
+                <i class="fa-solid fa-user-gear text-lg"></i><span>Perfil</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container Content -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 mb-16 md:mb-6">
+
+        <!-- ==================== TAB 1: DASHBOARD ==================== -->
+        <section id="tab-dashboard" class="space-y-6">
+            <!-- Welcome Banner -->
+            <div class="bg-gradient-to-r from-teal-700 via-teal-600 to-emerald-600 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
+                    <i class="fa-solid fa-bone text-[220px]"></i>
+                </div>
+                <div class="relative z-10 max-w-3xl">
+                    <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block backdrop-blur-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Plan Corrector Flexible Personalizado
+                    </span>
+                    <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">¡Hola, <span id="welcome-name">Amigo</span>!</h1>
+                    <p class="text-teal-100 text-sm sm:text-base leading-relaxed mb-4">
+                        Tu programa activo está adaptado para corregir: 
+                        <span id="conditions-badge-list" class="font-semibold text-white underline decoration-teal-300">Hombros adelantados, Diástasis</span>.
+                    </p>
+
+                    <!-- OBJECTIVE BANNER FOR TODAY'S SESSION -->
+                    <div class="bg-teal-900/60 border border-teal-400/40 rounded-2xl p-4 mb-6 backdrop-blur-md flex items-start space-x-3">
+                        <div class="p-2 bg-teal-500/30 rounded-xl text-teal-200 shrink-0 text-lg">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-extrabold uppercase tracking-widest text-teal-300 block">Objetivo Principal de la Sesión de Hoy:</span>
+                            <p class="text-xs sm:text-sm text-white font-medium mt-0.5 leading-snug" id="dashboard-session-objective">
+                                Coplacing Focus...
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="startTodayWorkout()" class="bg-white text-teal-800 font-bold px-6 py-3 rounded-xl hover:bg-teal-50 transition shadow-lg flex items-center space-x-2 text-sm sm:text-base">
+                            <i class="fa-solid fa-circle-play text-teal-600 text-lg"></i>
+                            <span>Comenzar Entrenamiento de Hoy</span>
+                        </button>
+                        <button onclick="switchTab('profile')" class="bg-teal-800/60 hover:bg-teal-800/80 text-white border border-teal-400/30 px-5 py-3 rounded-xl transition text-sm font-medium">
+                            Ajustar Días, Minutos y Patologías
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats & Gamification Summary -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-teal-100 text-teal-700 rounded-xl">
+                        <i class="fa-solid fa-calendar-check text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium">Días Activos / Sem</p>
+                        <h4 class="text-xl font-bold text-slate-800" id="stat-days-week">4 días</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-blue-100 text-blue-700 rounded-xl">
+                        <i class="fa-solid fa-clock text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium">Minutos esta Sem.</p>
+                        <h4 class="text-xl font-bold text-slate-800" id="stat-total-minutes">120 min</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl">
+                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium">Condiciones Activas</p>
+                        <h4 class="text-xl font-bold text-slate-800" id="stat-conditions-count">3 áreas</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4 cursor-pointer" onclick="switchTab('achievements')">
+                    <div class="p-3 bg-amber-100 text-amber-700 rounded-xl">
+                        <i class="fa-solid fa-trophy text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium">Racha & Medallas</p>
+                        <h4 class="text-xl font-bold text-slate-800" id="stat-streak-badges">3 Días / 2 🏆</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Prescribed Plan Preview -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Today's Routine List -->
+                <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-teal-600"></i>
+                                Rutina Recomendada para Hoy
+                            </h3>
+                            <p class="text-xs text-slate-500" id="today-duration-label">Duración programada: 30 minutos</p>
+                        </div>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold" id="today-date-str">Hoy</span>
+                    </div>
+
+                    <div id="dashboard-today-exercises" class="space-y-3">
+                        <!-- Dynamic JavaScript insertion -->
+                    </div>
+                </div>
+
+                <!-- Postural Advice & Alerts -->
+                <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 text-teal-400 text-sm font-bold mb-3">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <span>CONSEJO POSTURAL DEL DÍA</span>
+                        </div>
+                        <h4 class="font-bold text-base mb-2" id="daily-tip-title">Evita la protrusión cervical al trabajar</h4>
+                        <p class="text-slate-300 text-xs leading-relaxed mb-4" id="daily-tip-desc">
+                            Si sufres de vértigo cervical o molestias en cuello, alinea la oreja con la altura del hombro. Mantén la pantalla de tu ordenador al nivel de los ojos para evitar tensión constante en los trapecios.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-800/80 rounded-xl p-4 border border-slate-700">
+                        <div class="flex items-center space-x-3 text-amber-400 text-xs font-semibold mb-1">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <span>Precaución Especial</span>
+                        </div>
+                        <p class="text-slate-300 text-xs" id="daily-precaution">
+                            Evita los encogimientos abdominales clásicos (crunches) para no aumentar la diástasis recti.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: EXERCISES LIBRARY ==================== -->
+        <section id="tab-exercises" class="hidden space-y-6">
+            <!-- Filter & Search Bar -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Biblioteca Completa de Ejercicios Posturales</h2>
+                        <p class="text-xs text-slate-500">Explora ejercicios clasificados con simulación de avatar 2D animado y objetivos fisiológicos.</p>
+                    </div>
+                    <!-- Search Input -->
+                    <div class="relative w-full md:w-72">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="exercise-search" oninput="filterExercises()" placeholder="Buscar ejercicio, patología..." class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    </div>
+                </div>
+
+                <!-- Filters Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100">
+                    <!-- Zone Filter -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Zona Anatómica</label>
+                        <select id="filter-zone" onchange="filterExercises()" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 bg-slate-50 font-medium text-slate-700 focus:ring-2 focus:ring-teal-500">
+                            <option value="all">Todas las Zonas</option>
+                            <option value="cervical">Cervical & Cuello</option>
+                            <option value="upper_back">Espalda Alta & Hombros</option>
+                            <option value="core">Abdomen & Pelvis (Core)</option>
+                            <option value="lumbar">Zona Lumbar & Sacra</option>
+                        </select>
+                    </div>
+
+                    <!-- Difficulty Filter -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nivel / Dificultad</label>
+                        <select id="filter-level" onchange="filterExercises()" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 bg-slate-50 font-medium text-slate-700 focus:ring-2 focus:ring-teal-500">
+                            <option value="all">Todos los Niveles</option>
+                            <option value="Principiante">Principiante / Terapéutico</option>
+                            <option value="Intermedio">Intermedio</option>
+                            <option value="Avanzado">Avanzado</option>
+                        </select>
+                    </div>
+
+                    <!-- Condition Target Filter -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Recomendado para</label>
+                        <select id="filter-condition" onchange="filterExercises()" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 bg-slate-50 font-medium text-slate-700 focus:ring-2 focus:ring-teal-500">
+                            <option value="all">Todas las Condiciones</option>
+                            <option value="hombros_adelantados">Hombros Adelantados</option>
+                            <option value="diastasis">Diástasis Abdominal</option>
+                            <option value="vertigo">Vértigo Cervical / Tinnitus</option>
+                            <option value="hiperlordosis">Hiperlordosis / Cifosis</option>
+                            <option value="escoliosis">Asimetría / Escoliosis</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise Cards Grid -->
+            <div id="exercises-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically Populated -->
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: CALENDAR & PLANNER ==================== -->
+        <section id="tab-calendar" class="hidden space-y-6">
+            <!-- Header Schedule Options -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Calendario Personalizado de Entrenamiento</h2>
+                    <p class="text-xs text-slate-500">Horario semanal dinámico con explicaciones de objetivo para cada sesión.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="switchTab('profile')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center space-x-2">
+                        <i class="fa-solid fa-clock flex-shrink-0"></i>
+                        <span>Ajustar Tiempos por Día</span>
+                    </button>
+                    <button onclick="regenerateCalendar()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center space-x-2 shadow-md shadow-teal-600/20">
+                        <i class="fa-solid fa-arrows-rotate flex-shrink-0"></i>
+                        <span>Regenerar Rutinas</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Days Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-7 gap-4" id="calendar-days-container">
+                <!-- Days will be rendered by JS -->
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: ACHIEVEMENTS & GAMIFICATION ==================== -->
+        <section id="tab-achievements" class="hidden space-y-6">
+            <!-- Header Achievements -->
+            <div class="bg-gradient-to-r from-amber-500 via-amber-600 to-orange-500 rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <span class="bg-black/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block backdrop-blur-sm">
+                        <i class="fa-solid fa-trophy mr-1"></i> Sistema de Recompensas
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold">Tus Medallas & Logros Posturales</h2>
+                    <p class="text-amber-100 text-xs sm:text-sm mt-1 max-w-xl">
+                        Consigue insignias a medida que completas entrenamientos, acumulas racha diaria y mejoras la alineación de tu cuerpo.
+                    </p>
+                </div>
+                <!-- Total Medals Badge -->
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center min-w-[140px] border border-white/20">
+                    <span class="text-3xl font-black block" id="achievements-unlocked-count">2 / 8</span>
+                    <span class="text-xs uppercase tracking-wider text-amber-100 font-bold">Desbloqueadas</span>
+                </div>
+            </div>
+
+            <!-- Badges Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="achievements-grid">
+                <!-- Dynamically generated badges -->
+            </div>
+        </section>
+
+        <!-- ==================== TAB 5: USER PROFILE & MEDICAL SETUP ==================== -->
+        <section id="tab-profile" class="hidden space-y-6">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <!-- Profile Header -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h2 class="text-xl font-bold text-slate-800 mb-1">Perfil de Salud & Horarios Personalizados</h2>
+                    <p class="text-xs text-slate-500">Configura tus patologías y define exactamente qué días quieres entrenar y cuántos minutos dedicarle a cada sesión.</p>
+                </div>
+
+                <!-- Personal Info & Preferences Form -->
+                <form id="profile-form" onsubmit="saveProfile(event)" class="space-y-6">
+                    <!-- General Settings -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-user text-teal-600"></i> Datos Personales
+                        </h3>
+                        <div class="max-w-xs">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre / Apodo</label>
+                            <input type="text" id="user-name-input" value="María" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                        </div>
+                    </div>
+
+                    <!-- FLEXIBLE WEEKLY SCHEDULE SETUP -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-2">
+                            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-calendar-day text-teal-600"></i> Horario Flexible por Día de la Semana
+                            </h3>
+                            <span class="text-xs text-teal-600 font-semibold bg-teal-50 px-2.5 py-1 rounded-full">Asigna duraciones distintas (ej. 15 min y 45 min)</span>
+                        </div>
+                        <p class="text-xs text-slate-500">Selecciona la duración de la sesión para cada día. Elige "Descanso" en los días que prefieras no entrenar.</p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-3 pt-2" id="day-time-selectors-container">
+                            <!-- Dynamically generated days inputs -->
+                        </div>
+                    </div>
+
+                    <!-- Health & Posture Selectors -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-notes-medical text-teal-600"></i> Aspectos y Sintomatología a Corregir
+                        </h3>
+                        <p class="text-xs text-slate-500">Haz clic en todos los aspectos que apliquen a tu caso actual para ajustar los filtros de seguridad:</p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" id="conditions-selector-container">
+                            <!-- Condition Checkbox Items JS dynamic generated -->
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition shadow-lg shadow-teal-600/20 flex items-center space-x-2">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Guardar Perfil y Generar Nuevo Plan</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== EXERCISE DETAIL MODAL WITH ANIMATED AVATAR SIMULATION ==================== -->
+    <div id="exercise-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto custom-scrollbar shadow-2xl relative border border-slate-100">
+            <!-- Close Button -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 w-9 h-9 bg-slate-100 text-slate-500 hover:text-slate-800 rounded-full flex items-center justify-center transition z-10">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Modal Content (JS Populated) -->
+            <div id="modal-body" class="p-6 sm:p-8 space-y-6">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== WORKOUT PLAYER MODAL WITH CHRONOMETER & OBJECTIVE BANNER ==================== -->
+    <div id="workout-modal" class="fixed inset-0 bg-slate-950/95 text-white z-50 hidden flex flex-col justify-between p-4 sm:p-6 overflow-y-auto">
+        <!-- Top Bar & Session Objective -->
+        <div class="max-w-3xl mx-auto w-full border-b border-slate-800 pb-4">
+            <div class="flex justify-between items-center mb-2">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-teal-400" id="workout-progress-counter">Ejercicio 1 de 5</span>
+                    <h3 class="text-lg sm:text-xl font-extrabold" id="workout-title">Modo Entrenamiento Guiado</h3>
+                </div>
+                <button onclick="closeWorkoutModal()" class="text-slate-400 hover:text-white px-3 py-1.5 rounded-xl border border-slate-800 text-xs font-semibold">
+                    <i class="fa-solid fa-xmark mr-1"></i> Salir
+                </button>
+            </div>
+
+            <!-- SESSION OBJECTIVE BANNER IN PLAYER -->
+            <div class="bg-teal-950/80 border border-teal-500/30 rounded-2xl p-3 flex items-start space-x-3">
+                <div class="p-2 bg-teal-500/20 text-teal-300 rounded-lg text-sm shrink-0">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-teal-400 block">Objetivo Fisiológico de la Sesión</span>
+                    <p class="text-xs text-slate-200 font-medium" id="workout-session-objective">Fortalecer el transverso abdominal y descomprimir cervicales.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Central Player Content -->
+        <div class="max-w-2xl mx-auto w-full text-center space-y-4 my-auto py-2">
+            <!-- Simulated Avatar Canvas/Graphic -->
+            <div id="workout-svg-graphic" class="max-w-xs mx-auto bg-slate-900/90 rounded-2xl p-3 border border-slate-800 shadow-inner">
+                <!-- Injected Interactive Avatar Graphic -->
+            </div>
+
+            <div>
+                <h2 id="workout-ex-name" class="text-xl sm:text-2xl font-black text-white">Nombre del Ejercicio</h2>
+                <p id="workout-ex-desc" class="text-slate-300 text-xs sm:text-sm max-w-lg mx-auto leading-relaxed mt-1">
+                    Descripción breve y recomendación de forma.
+                </p>
+            </div>
+
+            <!-- Anatomical Visual Reinforcement Box -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 max-w-md mx-auto text-left flex items-center space-x-3">
+                <div class="w-9 h-9 bg-teal-900/40 text-teal-400 rounded-xl flex items-center justify-center shrink-0 text-lg">
+                    <i class="fa-solid fa-circle-nodes"></i>
+                </div>
+                <div>
+                    <h5 class="text-[10px] font-bold text-slate-400 uppercase">Foco de Ejecución</h5>
+                    <p id="workout-ex-focus" class="text-xs font-semibold text-teal-300">Activa escápulas y corrige postura</p>
+                </div>
+            </div>
+
+            <!-- INTERACTIVE CHRONOMETER / INTERVAL TIMER CONTROLLER -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 max-w-md mx-auto shadow-2xl relative">
+                <div class="flex items-center justify-center space-x-6">
+                    <!-- Timer Display -->
+                    <div class="text-center">
+                        <div class="text-3xl sm:text-4xl font-black text-teal-400 tracking-wider font-mono" id="chrono-display">
+                            00:45
+                        </div>
+                        <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5" id="chrono-phase-label">
+                            Tiempo de Serie Activa
+                        </div>
+                    </div>
+
+                    <!-- Chronometer Controls -->
+                    <div class="flex items-center space-x-2 border-l border-slate-800 pl-6">
+                        <button id="chrono-toggle-btn" onclick="toggleChronometer()" class="w-12 h-12 bg-teal-500 hover:bg-teal-400 text-slate-950 rounded-2xl flex items-center justify-center transition shadow-lg shadow-teal-500/20 text-lg font-bold">
+                            <i class="fa-solid fa-play" id="chrono-toggle-icon"></i>
+                        </button>
+                        <button onclick="resetChronometer()" class="w-10 h-10 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl flex items-center justify-center transition text-sm">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sets & Reps Tracker -->
+                <div class="mt-3 pt-3 border-t border-slate-800/80 flex justify-around text-xs">
+                    <div>
+                        <span class="text-slate-400 text-[10px] uppercase font-bold block">Series Recomendadas</span>
+                        <span class="font-extrabold text-white text-sm" id="workout-sets-count">3 Series</span>
+                    </div>
+                    <div class="border-r border-slate-800"></div>
+                    <div>
+                        <span class="text-slate-400 text-[10px] uppercase font-bold block">Repeticiones / Isometría</span>
+                        <span class="font-extrabold text-white text-sm" id="workout-reps-count">12 Reps o 45s</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation Controls -->
+        <div class="max-w-md mx-auto w-full space-y-2 pt-2">
+            <button onclick="nextWorkoutExercise()" class="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold py-3.5 rounded-2xl transition shadow-lg shadow-teal-500/20 text-sm flex items-center justify-center space-x-2">
+                <span>Completado / Siguiente Ejercicio</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ==================== JAVASCRIPT APPLICATION LOGIC ==================== -->
+    <script>
+        // --- EXERCISES DATABASE WITH ANIMATED HUMAN AVATAR SIMULATION SVG ---
+        const EXERCISES_DB = [
+            {
+                id: 'chin-tucks',
+                name: 'Retracción Cervical (Chin Tucks)',
+                zone: 'cervical',
+                zoneName: 'Cervical & Cuello',
+                level: 'Principiante',
+                conditions: ['vertigo', 'tinnitus', 'hombros_adelantados'],
+                icon: 'fa-user-ninja',
+                shortDesc: 'Alinea las vértebras cervicales y alivia la presión suboccipital reduciendo vértigos y tinnitus.',
+                // ANIMATED 2D HUMAN AVATAR SIMULATION
+                svgDiagram: `
+                    <svg viewBox="0 0 200 160" class="w-full h-40 bg-slate-900 rounded-2xl p-2">
+                        <!-- Background Reference Grid -->
+                        <line x1="100" y1="20" x2="100" y2="140" stroke="#334155" stroke-dasharray="4" stroke-width="1"/>
+                        
+                        <!-- Fixed Torso & Shoulders -->
+                        <path d="M 60,140 Q 60,110 85,100 L 115,100 Q 140,110 140,140" fill="#334155" stroke="#475569" stroke-width="2"/>
+                        <!-- Chest Anatomy -->
+                        <path d="M 85,100 Q 100,120 115,100" fill="none" stroke="#64748b" stroke-width="2"/>
+                        
+                        <!-- Neck Base -->
+                        <rect x="92" y="70" width="16" height="32" rx="4" fill="#64748b"/>
+                        
+                        <!-- ANIMATED AVATAR HEAD GROUP (Simulating Chin Tuck Motion) -->
+                        <g class="anim-chin-head">
+                            <!-- Head Outline Avatar -->
+                            <circle cx="100" cy="48" r="22" fill="#94a3b8" stroke="#cbd5e1" stroke-width="2"/>
+                            <!-- Avatar Facial Reference Profile -->
+                            <circle cx="114" cy="46" r="3" fill="#1e293b"/> <!-- Eye -->
+                            <path d="M 120,52 Q 115,55 110,53" stroke="#1e293b" stroke-width="2" fill="none"/> <!-- Nose/Chin line -->
+                            <!-- Ear Reference -->
+                            <ellipse cx="94" cy="48" rx="3" ry="5" fill="#64748b"/>
+                        </g>
+
+                        <!-- Cervical Spine Muscle Highlight -->
+                        <path d="M 88,60 Q 94,75 92,90" fill="none" stroke="#ff6b6b" stroke-width="6" class="animate-muscle"/>
+                        
+                        <!-- Motion Arrow Pointer -->
+                        <path d="M 125,48 L 105,48" stroke="#14b8a6" stroke-width="3" stroke-linecap="round" class="motion-guide"/>
+                        <polygon points="103,48 110,44 110,52" fill="#14b8a6"/>
+                        
+                        <text x="100" y="152" text-anchor="middle" fill="#14b8a6" font-size="9" font-weight="bold">Simulación Avatar: Retracción de Cabeza</text>
+                    </svg>
+                `,
+                instructions: [
+                    'Siéntate erguido mirando al frente.',
+                    'Lleva el mentón suavemente hacia atrás como intentando hacer "doble papada".',
+                    'Mantén la mirada al frente sin inclinar la cabeza hacia abajo.',
+                    'Sostén 3-5 segundos y regresa a la posición neutra.'
+                ],
+                mistakes: ['Inclinar la cabeza hacia abajo', 'Forzar excesivamente la garganta', 'Elevar los hombros'],
+                progressions: {
+                    initial: 'Realizar apoyado en la pared para tener referencia táctil (10 reps).',
+                    intermedio: 'Realizar sentado libre manteniendo 5s de isométrica (12 reps).',
+                    avanzado: 'Realizar tumbado boca arriba con elevación ligera de cabeza de 1cm (15 reps).'
+                },
+                muscleTargets: 'Músculos flexores profundos del cuello, trapecio superior'
+            },
+            {
+                id: 'wall-angels',
+                name: 'Ángeles en Pared (Wall Angels)',
+                zone: 'upper_back',
+                zoneName: 'Espalda Alta & Hombros',
+                level: 'Intermedio',
+                conditions: ['hombros_adelantados', 'hiperlordosis'],
+                icon: 'fa-person-arms-up',
+                shortDesc: 'Abre el tórax, fortalece la musculatura interescapular y combate la joroba o cifosis.',
+                svgDiagram: `
+                    <svg viewBox="0 0 200 160" class="w-full h-40 bg-slate-900 rounded-2xl p-2">
+                        <!-- Wall Surface Line -->
+                        <line x1="30" y1="135" x2="170" y2="135" stroke="#475569" stroke-width="3"/>
+                        
+                        <!-- Avatar Torso (Back View) -->
+                        <rect x="85" y="60" width="30" height="60" rx="8" fill="#334155" stroke="#64748b" stroke-width="2"/>
+                        <!-- Avatar Head -->
+                        <circle cx="100" cy="40" r="14" fill="#94a3b8"/>
+                        
+                        <!-- ANIMATED ARMS GROUP -->
+                        <g class="anim-wall-arms">
+                            <!-- Left Arm Cactus -->
+                            <path d="M 85,70 L 55,70 L 55,40" stroke="#14b8a6" stroke-width="6" stroke-linecap="round" fill="none"/>
+                            <!-- Right Arm Cactus -->
+                            <path d="M 115,70 L 145,70 L 145,40" stroke="#14b8a6" stroke-width="6" stroke-linecap="round" fill="none"/>
+                            <!-- Hands -->
+                            <circle cx="55" cy="38" r="5" fill="#ccfbf1"/>
+                            <circle cx="145" cy="38" r="5" fill="#ccfbf1"/>
+                        </g>
+
+                        <!-- Scapular Muscle Glow -->
+                        <circle cx="92" cy="78" r="5" fill="#ff6b6b" class="animate-muscle"/>
+                        <circle cx="108" cy="78" r="5" fill="#ff6b6b" class="animate-muscle"/>
+
+                        <text x="100" y="152" text-anchor="middle" fill="#14b8a6" font-size="9" font-weight="bold">Simulación Avatar: Deslizamiento Escapular</text>
+                    </svg>
+                `,
+                instructions: [
+                    'Apoya toda la espalda y cabeza contra una pared.',
+                    'Coloca los brazos en posición de "cactus" formando ángulos de 90° con los codos.',
+                    'Desliza los brazos hacia arriba manteniendo codos y muñecas en contacto con la pared.'
+                ],
+                mistakes: ['Despegar la zona lumbar de la pared', 'Forzar los hombros hacia las orejas'],
+                progressions: {
+                    initial: 'Realizar de pie con rango de movimiento reducido.',
+                    intermedio: 'Apoyando completamente la espalda con retroversión pélvica.',
+                    avanzado: 'Añadir pequeñas bandas elásticas de resistencia en las muñecas.'
+                },
+                muscleTargets: 'Romboides, trapecio inferior y medio, deltoides posterior'
+            },
+            {
+                id: 'transverse-activation',
+                name: 'Activación Transverso Abdominal & Suelo Pélvico',
+                zone: 'core',
+                zoneName: 'Abdomen & Core',
+                level: 'Principiante',
+                conditions: ['diastasis', 'hiperlordosis'],
+                icon: 'fa-shield-halved',
+                shortDesc: 'Ejercicio imprescindible para la diástasis abdominal. Reeduca la faja abdominal profunda.',
+                svgDiagram: `
+                    <svg viewBox="0 0 200 160" class="w-full h-40 bg-slate-900 rounded-2xl p-2">
+                        <!-- Floor Line -->
+                        <line x1="20" y1="125" x2="180" y2="125" stroke="#475569" stroke-width="2"/>
+                        
+                        <!-- Supine Lying Avatar Figure -->
+                        <!-- Legs Bent -->
+                        <path d="M 130,125 L 150,90 L 170,125" fill="none" stroke="#64748b" stroke-width="6" stroke-linecap="round"/>
+                        <!-- Head -->
+                        <circle cx="35" cy="115" r="11" fill="#94a3b8"/>
+                        <!-- Upper Torso -->
+                        <path d="M 45,120 L 75,115" stroke="#334155" stroke-width="12" stroke-linecap="round"/>
+                        
+                        <!-- ANIMATED ABDOMINAL TRANSVERSE BELT -->
+                        <g class="anim-transverse">
+                            <rect x="75" y="105" width="45" height="18" rx="6" fill="#14b8a6" stroke="#ccfbf1" stroke-width="2"/>
+                            <!-- Deep core muscle highlight -->
+                            <rect x="82" y="109" width="31" height="10" rx="4" fill="#ff6b6b" class="animate-muscle"/>
+                        </g>
+
+                        <!-- Inward Core Vector Arrow -->
+                        <path d="M 97,92 L 97,104" stroke="#14b8a6" stroke-width="3" class="motion-guide"/>
+                        <polygon points="97,106 93,100 101,100" fill="#14b8a6"/>
+
+                        <text x="100" y="152" text-anchor="middle" fill="#14b8a6" font-size="9" font-weight="bold">Simulación Avatar: Abrochado del Transverso</text>
+                    </svg>
+                `,
+                instructions: [
+                    'Túmbate boca arriba con las rodillas dobladas y pies apoyados.',
+                    'Exhala suavemente mientras llevas el ombligo hacia dentro y hacia la columna.',
+                    'Imagina que abrochas un cinturón apretado sin comprimir la caja torácica.',
+                    'Mantén la respiración fluida en la parte alta.'
+                ],
+                mistakes: ['Hacer un crunch o flexionar el cuello', 'Aguantar la respiración (Maniobra de Valsalva)'],
+                progressions: {
+                    initial: 'Tumbado supino respirando profundamente y activando faja (30s).',
+                    intermedio: 'Manteniendo la activación mientras elevas alternativamente un pie (Marcha supina).',
+                    avanzado: 'Extensión de pierna completa deslizándola por el suelo manteniendo el abdomen plano.'
+                },
+                muscleTargets: 'Músculo Transverso del Abdomen, Suelo Pélvico, Músculos Multífidos'
+            },
+            {
+                id: 'thoracic-extension',
+                name: 'Extensión Torácica con Rodillo o Toalla',
+                zone: 'upper_back',
+                zoneName: 'Espalda Alta & Hombros',
+                level: 'Principiante',
+                conditions: ['hombros_adelantados', 'cifosis'],
+                icon: 'fa-mattress-pillow',
+                shortDesc: 'Desbloquea la rigidez dorsal y restaura la curvatura natural de la columna.',
+                svgDiagram: `
+                    <svg viewBox="0 0 200 160" class="w-full h-40 bg-slate-900 rounded-2xl p-2">
+                        <!-- Foam Roller / Towel Roll -->
+                        <circle cx="100" cy="110" r="16" fill="#14b8a6" stroke="#ccfbf1" stroke-width="3"/>
+                        
+                        <!-- ANIMATED SPINE ARCHING OVER ROLLER -->
+                        <g class="anim-thoracic-spine">
+                            <!-- Upper Body Arch -->
+                            <path d="M 45,120 Q 95,78 145,115" fill="none" stroke="#94a3b8" stroke-width="7" stroke-linecap="round"/>
+                            <!-- Avatar Head Support -->
+                            <circle cx="45" cy="120" r="12" fill="#334155"/>
+                            <!-- Hands Behind Head -->
+                            <path d="M 45,120 Q 35,105 50,105" fill="none" stroke="#14b8a6" stroke-width="4"/>
+                        </g>
+
+                        <!-- Thoracic Spine Focus Pulse -->
+                        <circle cx="95" cy="90" r="7" fill="#ff6b6b" class="animate-muscle"/>
+
+                        <text x="100" y="152" text-anchor="middle" fill="#14b8a6" font-size="9" font-weight="bold">Simulación Avatar: Movilización Cifosis Torácica</text>
+                    </svg>
+                `,
+                instructions: [
+                    'Coloca una toalla enrollada o un foam roller bajo tu columna dorsal (mitad de la espalda).',
+                    'Cruza las manos detrás de la cabeza sujetando el cuello.',
+                    'Abre los codos y deja caer suavemente el torso hacia atrás respirando hondo.'
+                ],
+                mistakes: ['Arquear la zona lumbar en vez de la dorsal', 'Tironear del cuello'],
+                progressions: {
+                    initial: 'Toalla pequeña enrollada durante 1 minuto estático.',
+                    intermedio: 'Foam Roller realizando suave rodaje de 2 minutos.',
+                    avanzado: 'Añadir rotación torácica lateral mantenida.'
+                },
+                muscleTargets: 'Vertebras dorsales, Pectoral mayor/menor, Movilidad de la caja torácica'
+            },
+            {
+                id: 'bird-dog',
+                name: 'Perro de Caza (Bird-Dog)',
+                zone: 'core',
+                zoneName: 'Abdomen & Core',
+                level: 'Intermedio',
+                conditions: ['diastasis', 'hiperlordosis', 'escoliosis'],
+                icon: 'fa-dog',
+                shortDesc: 'Estabiliza las cadenas musculares cruzadas sin sobrecargar la zona lumbar.',
+                svgDiagram: `
+                    <svg viewBox="0 0 200 160" class="w-full h-40 bg-slate-900 rounded-2xl p-2">
+                        <!-- Quadruped Base Torso Avatar -->
+                        <rect x="75" y="60" width="50" height="22" rx="6" fill="#334155" stroke="#475569" stroke-width="2"/>
+                        <!-- Head -->
+                        <circle cx="62" cy="62" r="10" fill="#94a3b8"/>
+                        <!-- Support Leg & Arm -->
+                        <path d="M 85,82 L 85,115" stroke="#64748b" stroke-width="5" stroke-linecap="round"/>
+                        <path d="M 115,82 L 115,115" stroke="#64748b" stroke-width="5" stroke-linecap="round"/>
+
+                        <!-- ANIMATED EXTENDED ARM -->
+                        <g class="anim-bd-arm">
+                            <path d="M 75,68 L 30,68" stroke="#14b8a6" stroke-width="5" stroke-linecap="round"/>
+                            <circle cx="28" cy="68" r="4" fill="#ccfbf1"/>
+                        </g>
+
+                        <!-- ANIMATED EXTENDED LEG -->
+                        <g class="anim-bd-leg">
+                            <path d="M 125,68 L 170,68" stroke="#14b8a6" stroke-width="5" stroke-linecap="round"/>
+                            <circle cx="172" cy="68" r="4" fill="#ccfbf1"/>
+                        </g>
+
+                        <!-- Core Stability Muscle Highlight -->
+                        <rect x="85" y="65" width="30" height="12" rx="3" fill="#ff6b6b" class="animate-muscle"/>
+
+                        <text x="100" y="152" text-anchor="middle" fill="#14b8a6" font-size="9" font-weight="bold">Simulación Avatar: Extensión Diagonal Estable</text>
+                    </svg>
+                `,
+                instructions: [
+                    'Colócate en quadrupedia (manos bajo hombros, rodillas bajo caderas).',
+                    'Extiende el brazo derecho hacia adelante y la pierna izquierda hacia atrás en línea recta.',
+                    'Mantén las caderas niveladas sin rotar la pelvis.',
+                    'Vuelve suavemente al centro y cambia de lado.'
+                ],
+                mistakes: ['Arquear la zona lumbar al elevar la pierna', 'Rotar la cadera'],
+                progressions: {
+                    initial: 'Elevar únicamente una pierna a la vez sin mover los brazos.',
+                    intermedio: 'Elevar brazo y pierna contraria mantenido 3 segundos.',
+                    avanzado: 'Juntar codo y rodilla en el centro antes de volver a extender.'
+                },
+                muscleTargets: 'Multífidos, Glúteo mayor, Transverso abdominal, Serrato anterior'
+            },
+            {
+                id: 'scapular-pushups',
+                name: 'Flexiones Escapulares en Quadrupedia/Pared',
+                zone: 'upper_back',
+                zoneName: 'Espalda Alta & Hombros',
+                level: 'Principiante',
+                conditions: ['hombros_adelantados', 'escoliosis'],
+                icon: 'fa-hand-back-fist',
+                shortDesc: 'Reeduca el serrato anterior fijando las escápulas y evitando las alas escapulares.',
+                svgDiagram: `
+                    <svg viewBox="0 0 200 160" class="w-full h-40 bg-slate-900 rounded-2xl p-2">
+                        <!-- Wall Support -->
+                        <line x1="145" y1="20" x2="145" y2="135" stroke="#475569" stroke-width="4"/>
+                        
+                        <!-- Avatar Inclined -->
+                        <path d="M 60,125 L 95,55 L 140,55" stroke="#334155" stroke-width="6" fill="none" stroke-linecap="round"/>
+                        <circle cx="90" cy="42" r="11" fill="#94a3b8"/>
+                        
+                        <!-- Scapular Serratus Muscle Pulse -->
+                        <circle cx="102" cy="62" r="7" fill="#ff6b6b" class="animate-muscle"/>
+                        
+                        <!-- Retraction Guide Arrows -->
+                        <path d="M 85,70 L 105,70" stroke="#14b8a6" stroke-width="3" class="motion-guide"/>
+                        
+                        <text x="100" y="152" text-anchor="middle" fill="#14b8a6" font-size="9" font-weight="bold">Simulación Avatar: Retracción & Proto-Serrato</text>
+                    </svg>
+                `,
+                instructions: [
+                    'Ponte en quadrupedia o de pie frente a una pared con brazos extendidos.',
+                    'Sin doblar los codos, deja que tu pecho se hunda suavemente juntando las escápulas.',
+                    'Empuja el suelo o pared para alejar el pecho y juntar los omóplatos hacia fuera.'
+                ],
+                mistakes: ['Doblar los codos', 'Arquear la zona lumbar'],
+                progressions: {
+                    initial: 'Realizar apoyado en la pared.',
+                    intermedio: 'Realizar en quadrupedia en el suelo.',
+                    avanzado: 'Realizar en posición de plancha alta.'
+                },
+                muscleTargets: 'Serrato anterior, Romboides'
+            },
+            {
+                id: 'glute-bridge',
+                name: 'Puente Glúteo Terapéutico',
+                zone: 'lumbar',
+                zoneName: 'Zona Lumbar & Pelvis',
+                level: 'Principiante',
+                conditions: ['hiperlordosis', 'diastasis'],
+                icon: 'fa-archway',
+                shortDesc: 'Elimina la hiperlordosis reeducando la báscula pélvica y fortaleciendo el glúteo.',
+                svgDiagram: `
+                    <svg viewBox="0 0 200 160" class="w-full h-40 bg-slate-900 rounded-2xl p-2">
+                        <!-- Floor Line -->
+                        <line x1="20" y1="125" x2="180" y2="125" stroke="#475569" stroke-width="2"/>
+                        
+                        <!-- Shoulder & Head grounded -->
+                        <circle cx="45" cy="118" r="11" fill="#334155"/>
+                        
+                        <!-- ANIMATED BRIDGE PELVIS ELEVATION -->
+                        <g class="anim-bridge-pelvis">
+                            <!-- Arch Body Avatar -->
+                            <path d="M 45,120 L 95,90 L 140,125" fill="none" stroke="#14b8a6" stroke-width="8" stroke-linecap="round"/>
+                            <!-- Glute Muscle Activation Glow -->
+                            <circle cx="95" cy="88" r="8" fill="#ff6b6b" class="animate-muscle"/>
+                        </g>
+
+                        <!-- Motion Arrow upward -->
+                        <path d="M 95,115 L 95,95" stroke="#14b8a6" stroke-width="3" class="motion-guide"/>
+
+                        <text x="100" y="152" text-anchor="middle" fill="#14b8a6" font-size="9" font-weight="bold">Simulación Avatar: Elevación de Pelvis & Glúteo</text>
+                    </svg>
+                `,
+                instructions: [
+                    'Túmbate boca arriba con las rodillas flexionadas.',
+                    'Realiza una ligera basculación pélvica (retroversión) pegando la zona lumbar al suelo.',
+                    'Empuja con los talones para elevar la cadera hasta alinear rodillas, cadera y hombros.'
+                ],
+                mistakes: ['Hiper-extender la columna lumbar al subir', 'Despegar los pies'],
+                progressions: {
+                    initial: 'Elevación de pelvis simple con 2s de pausa arriba.',
+                    intermedio: 'Puente a una pierna (unilateral).',
+                    avanzado: 'Puente con pies sobre superficie inestable o con banda elástica en rodillas.'
+                },
+                muscleTargets: 'Glúteo mayor, Isquiotibiales, Abdomen inferior'
+            },
+            {
+                id: 'suboccipital-release',
+                name: 'Auto-Liberación Suboccipital & Giro Cervical',
+                zone: 'cervical',
+                zoneName: 'Cervical & Cuello',
+                level: 'Principiante',
+                conditions: ['vertigo', 'tinnitus'],
+                icon: 'fa-brain',
+                shortDesc: 'Descomprime los nervios suboccipitales reduciendo la presión intracraneal, mareos y tinnitus.',
+                svgDiagram: `
+                    <svg viewBox="0 0 200 160" class="w-full h-40 bg-slate-900 rounded-2xl p-2">
+                        <!-- Head Avatar Back Profile -->
+                        <circle cx="100" cy="55" r="28" fill="#334155" stroke="#64748b" stroke-width="2"/>
+                        <path d="M 90,80 L 90,120 M 110,80 L 110,120" stroke="#475569" stroke-width="6"/>
+                        
+                        <!-- Suboccipital Trigger Points Glow -->
+                        <circle cx="86" cy="72" r="6" fill="#ff6b6b" class="animate-muscle"/>
+                        <circle cx="114" cy="72" r="6" fill="#ff6b6b" class="animate-muscle"/>
+                        
+                        <!-- Gentle Rotation Guide Arrow -->
+                        <path d="M 68,55 A 32 32 0 0 1 132 55" fill="none" stroke="#14b8a6" stroke-width="3" class="motion-guide"/>
+                        
+                        <text x="100" y="152" text-anchor="middle" fill="#14b8a6" font-size="9" font-weight="bold">Simulación Avatar: Liberación Miofascial Nuca</text>
+                    </svg>
+                `,
+                instructions: [
+                    'Coloca tus yemas de los dedos en la base dura del cráneo (nuca).',
+                    'Aplica una suave presión hacia arriba y realiza micro giros suaves de cabeza.',
+                    'Mantén la respiración lenta durante 1 minuto.'
+                ],
+                mistakes: ['Presionar con demasiada fuerza', 'Movimientos bruscos del cuello'],
+                progressions: {
+                    initial: 'Tumbado con dos pelotas de tenis bajo la nuca (2 min).',
+                    intermedio: 'Masaje manual activo con inclinaciones leves de cabeza.',
+                    avanzado: 'Estiramiento activo de trapecio combinado con movilidad ocular.'
+                },
+                muscleTargets: 'Músculos rectos y oblicuos posteriores de la cabeza'
+            }
+        ];
+
+        // --- HEALTH CONDITIONS DICTIONARY ---
+        const HEALTH_CONDITIONS = [
+            { id: 'hombros_adelantados', label: 'Hombros Adelantados / Cifosis', desc: 'Postura encorvada, cabeza adelantada' },
+            { id: 'diastasis', label: 'Diástasis Abdominal', desc: 'Separación de la faja recta abdominal' },
+            { id: 'vertigo', label: 'Vértigo Cervical / Mareos', desc: 'Tensión cervical que genera inestabilidad' },
+            { id: 'tinnitus', label: 'Tinnitus / Tensión Mandibular (ATM)', desc: 'Zumbidos vinculados a tensión cervical/facial' },
+            { id: 'hiperlordosis', label: 'Hiperlordosis Lumbar', desc: 'Curvatura lumbar excesiva (pelvis en anteversión)' },
+            { id: 'escoliosis', label: 'Asimetría / Escoliosis', desc: 'Descompensación o curvatura lateral de columna' }
+        ];
+
+        // --- ACHIEVEMENTS / BADGES DICTIONARY ---
+        const ACHIEVEMENTS_DB = [
+            { id: 'first_step', title: 'Primer Paso', desc: 'Completa tu primer entrenamiento postural.', icon: 'fa-shoe-prints', reqType: 'workouts', reqVal: 1 },
+            { id: 'streak_3', title: 'Constancia Inicial', desc: 'Consigue una racha de 3 días consecutivos.', icon: 'fa-fire', reqType: 'streak', reqVal: 3 },
+            { id: 'streak_7', title: 'Hábito de Hierro', desc: 'Alcanza una racha de 7 días seguidos.', icon: 'fa-bolt', reqType: 'streak', reqVal: 7 },
+            { id: 'time_60', title: 'Primera Hora', desc: 'Acumula 60 minutos de ejercicio corrector.', icon: 'fa-clock', reqType: 'minutes', reqVal: 60 },
+            { id: 'time_300', title: 'Postura de Acero', desc: 'Acumula 300 minutos totales de entrenamiento.', icon: 'fa-hourglass-half', reqType: 'minutes', reqVal: 300 },
+            { id: 'cervical_master', title: 'Cuello Relajado', desc: 'Completa 5 ejercicios enfocados en zona cervical.', icon: 'fa-spa', reqType: 'workouts', reqVal: 3 },
+            { id: 'core_shield', title: 'Core Protector', desc: 'Realiza 5 ejercicios de activación segura del transverso.', icon: 'fa-shield-halved', reqType: 'workouts', reqVal: 5 },
+            { id: 'flex_champion', title: 'Planificador Flexible', desc: 'Personaliza tu horario asignando duraciones variadas.', icon: 'fa-calendar-week', reqType: 'custom', reqVal: 1 }
+        ];
+
+        // --- APP STATE ---
+        let userProfile = {
+            name: 'María',
+            daySchedules: {
+                Lunes: 15,
+                Martes: 30,
+                Miércoles: 0,
+                Jueves: 45,
+                Viernes: 15,
+                Sábado: 30,
+                Domingo: 0
+            },
+            conditions: ['hombros_adelantados', 'diastasis', 'vertigo'],
+            streakDays: 3,
+            completedWorkoutsCount: 4,
+            totalMinutesTrained: 135,
+            unlockedBadges: ['first_step', 'streak_3']
+        };
+
+        let generatedCalendar = [];
+
+        // --- TIMER / CHRONOMETER STATE ---
+        let chronoTimer = null;
+        let chronoSeconds = 45;
+        let chronoRunning = false;
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            loadProfileFromStorage();
+            renderProfileSelectorForm();
+            updateUIProfileHeader();
+            generateSmartPlan();
+            renderExercisesGrid(EXERCISES_DB);
+            renderAchievementsGrid();
+            switchTab('dashboard');
+            
+            const options = { weekday: 'long', month: 'short', day: 'numeric' };
+            document.getElementById('today-date-str').textContent = new Date().toLocaleDateString('es-ES', options);
+        };
+
+        // --- STORAGE HANDLERS ---
+        function loadProfileFromStorage() {
+            const saved = localStorage.getItem('posturefix_user_v3');
+            if (saved) {
+                try {
+                    userProfile = Object.assign(userProfile, JSON.parse(saved));
+                } catch(e) {
+                    console.error("Could not parse saved user profile", e);
+                }
+            }
+        }
+
+        function saveProfileToStorage() {
+            localStorage.setItem('posturefix_user_v3', JSON.stringify(userProfile));
+        }
+
+        // --- TAB NAVIGATION ---
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'exercises', 'calendar', 'achievements', 'profile'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
+                if (t === tabId) {
+                    el.classList.remove('hidden');
+                    if(nav) nav.classList.add('tab-active');
+                } else {
+                    el.classList.add('hidden');
+                    if(nav) nav.classList.remove('tab-active');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- PROFILE FORM CONTROLLER ---
+        function renderProfileSelectorForm() {
+            document.getElementById('user-name-input').value = userProfile.name;
+
+            const weekDays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            const daysContainer = document.getElementById('day-time-selectors-container');
+            daysContainer.innerHTML = '';
+
+            weekDays.forEach(day => {
+                const currentDuration = userProfile.daySchedules[day] !== undefined ? userProfile.daySchedules[day] : 30;
+                const card = document.createElement('div');
+                card.className = `p-3 rounded-2xl border flex flex-col justify-between text-center ${currentDuration > 0 ? 'bg-teal-50/60 border-teal-200' : 'bg-slate-50 border-slate-200'}`;
+                
+                card.innerHTML = `
+                    <span class="text-xs font-bold text-slate-800 mb-1 block">${day}</span>
+                    <select id="schedule-day-${day}" onchange="updateDayCardStyle(this)" class="w-full text-xs p-2 rounded-xl border border-slate-300 bg-white font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500">
+                        <option value="0" ${currentDuration === 0 ? 'selected' : ''}>😴 Descanso</option>
+                        <option value="15" ${currentDuration === 15 ? 'selected' : ''}>⏱️ 15 min</option>
+                        <option value="30" ${currentDuration === 30 ? 'selected' : ''}>⏱️ 30 min</option>
+                        <option value="45" ${currentDuration === 45 ? 'selected' : ''}>⏱️ 45 min</option>
+                        <option value="60" ${currentDuration === 60 ? 'selected' : ''}>⏱️ 60 min</option>
+                    </select>
+                `;
+                daysContainer.appendChild(card);
+            });
+
+            const container = document.getElementById('conditions-selector-container');
+            container.innerHTML = '';
+
+            HEALTH_CONDITIONS.forEach(cond => {
+                const isChecked = userProfile.conditions.includes(cond.id);
+                const card = document.createElement('label');
+                card.className = `border rounded-2xl p-4 cursor-pointer transition flex items-start space-x-3 ${isChecked ? 'bg-teal-50/80 border-teal-500 shadow-sm' : 'bg-slate-50 border-slate-200 hover:border-slate-300'}`;
+                
+                card.innerHTML = `
+                    <input type="checkbox" name="condition" value="${cond.id}" ${isChecked ? 'checked' : ''} class="mt-1 w-4 h-4 text-teal-600 rounded focus:ring-teal-500" onchange="toggleConditionStyle(this)">
+                    <div>
+                        <span class="text-xs font-bold text-slate-800 block">${cond.label}</span>
+                        <span class="text-[11px] text-slate-500 leading-tight block mt-0.5">${cond.desc}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateDayCardStyle(selectEl) {
+            const card = selectEl.closest('div');
+            if (parseInt(selectEl.value) > 0) {
+                card.className = 'p-3 rounded-2xl border flex flex-col justify-between text-center bg-teal-50/60 border-teal-200';
+            } else {
+                card.className = 'p-3 rounded-2xl border flex flex-col justify-between text-center bg-slate-50 border-slate-200';
+            }
+        }
+
+        function toggleConditionStyle(checkbox) {
+            const label = checkbox.closest('label');
+            if (checkbox.checked) {
+                label.classList.add('bg-teal-50/80', 'border-teal-500', 'shadow-sm');
+                label.classList.remove('bg-slate-50', 'border-slate-200');
+            } else {
+                label.classList.remove('bg-teal-50/80', 'border-teal-500', 'shadow-sm');
+                label.classList.add('bg-slate-50', 'border-slate-200');
+            }
+        }
+
+        function saveProfile(e) {
+            e.preventDefault();
+            const name = document.getElementById('user-name-input').value || 'Usuario';
+            
+            const weekDays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            const newDaySchedules = {};
+            weekDays.forEach(day => {
+                const val = parseInt(document.getElementById(`schedule-day-${day}`).value);
+                newDaySchedules[day] = val;
+            });
+
+            const checkboxes = document.querySelectorAll('input[name="condition"]:checked');
+            const selectedConditions = Array.from(checkboxes).map(cb => cb.value);
+
+            userProfile.name = name;
+            userProfile.daySchedules = newDaySchedules;
+            userProfile.conditions = selectedConditions;
+
+            if(!userProfile.unlockedBadges.includes('flex_champion')) {
+                userProfile.unlockedBadges.push('flex_champion');
+            }
+
+            saveProfileToStorage();
+            updateUIProfileHeader();
+            generateSmartPlan();
+            renderAchievementsGrid();
+            switchTab('dashboard');
+        }
+
+        function updateUIProfileHeader() {
+            document.getElementById('welcome-name').textContent = userProfile.name;
+            document.getElementById('user-display-name').textContent = userProfile.name;
+            document.getElementById('user-avatar-initials').textContent = userProfile.name.substring(0,2).toUpperCase();
+            
+            const weekDays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            let activeDaysCount = 0;
+            let weeklyMinutes = 0;
+            weekDays.forEach(d => {
+                const duration = userProfile.daySchedules[d] || 0;
+                if(duration > 0) {
+                    activeDaysCount++;
+                    weeklyMinutes += duration;
+                }
+            });
+
+            document.getElementById('stat-days-week').textContent = `${activeDaysCount} días`;
+            document.getElementById('stat-total-minutes').textContent = `${weeklyMinutes} min`;
+            document.getElementById('stat-conditions-count').textContent = `${userProfile.conditions.length} objetivo${userProfile.conditions.length !== 1 ? 's' : ''}`;
+            
+            document.getElementById('header-streak-count').textContent = `${userProfile.streakDays} Días`;
+            document.getElementById('stat-streak-badges').textContent = `${userProfile.streakDays} Días / ${userProfile.unlockedBadges.length} 🏆`;
+
+            const condNames = userProfile.conditions.map(cId => {
+                const found = HEALTH_CONDITIONS.find(h => h.id === cId);
+                return found ? found.label.split('/')[0] : cId;
+            });
+
+            document.getElementById('conditions-badge-list').textContent = condNames.length > 0 ? condNames.join(', ') : 'Mantenimiento General';
+            
+            if (userProfile.conditions.includes('vertigo') || userProfile.conditions.includes('tinnitus')) {
+                document.getElementById('daily-tip-title').textContent = 'Atención al Vértigo Cervical & Mandíbula';
+                document.getElementById('daily-tip-desc').textContent = 'Evita rotaciones o extensiones bruscas de cuello. En los ejercicios con cuello, mantén la vista alineada al frente y relaja la mordida.';
+                document.getElementById('daily-precaution').textContent = 'Realiza movimientos lentos y respira siempre de forma consciente.';
+            } else if (userProfile.conditions.includes('diastasis')) {
+                document.getElementById('daily-tip-title').textContent = 'Protege tu Diástasis Recti';
+                document.getElementById('daily-tip-desc').textContent = 'Al levantarte de la cama o del suelo, gírate siempre de lado primero. Evita abombamientos abdominales.';
+                document.getElementById('daily-precaution').textContent = 'Prohibidos flexiones de tronco clásicas (crunches) e hipopresivos sin supervisión.';
+            }
+        }
+
+        // --- SMART PLAN GENERATOR WITH DYNAMIC PURPOSE OBJECTIVES ---
+        function generateSmartPlan() {
+            const weekDays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            
+            let targetExercises = EXERCISES_DB.filter(ex => {
+                return ex.conditions.some(cond => userProfile.conditions.includes(cond));
+            });
+
+            if (targetExercises.length < 4) {
+                targetExercises = EXERCISES_DB;
+            }
+
+            // Objective generator sentences based on conditions
+            const generateObjective = (exercises) => {
+                const zones = [...new Set(exercises.map(e => e.zoneName))];
+                let primaryConds = userProfile.conditions.map(c => {
+                    const f = HEALTH_CONDITIONS.find(h => h.id === c);
+                    return f ? f.label.split('/')[0] : '';
+                }).filter(Boolean);
+
+                if (primaryConds.length > 0) {
+                    return `Hoy nos centraremos principalmente en corregir tu ${primaryConds[0]} y trabajar la zona de ${zones.slice(0,2).join(' y ')} sin sobrecargar las articulaciones.`;
+                }
+                return `Sesión orientada al reequilibrio postural global y fortalecimiento de ${zones.join(', ')}.`;
+            };
+
+            generatedCalendar = weekDays.map((dayName) => {
+                const duration = userProfile.daySchedules[dayName] || 0;
+                
+                if (duration === 0) {
+                    return {
+                        day: dayName,
+                        duration: 0,
+                        isRest: true,
+                        objective: 'Día de descanso activo para permitir la regeneración tisular y prevenir la fatiga postural.',
+                        exercises: []
+                    };
+                }
+
+                let exCount = 3;
+                if (duration === 30) exCount = 4;
+                else if (duration === 45) exCount = 5;
+                else if (duration >= 60) exCount = 6;
+
+                const shuffled = [...targetExercises].sort(() => 0.5 - Math.random());
+                const selected = shuffled.slice(0, exCount);
+
+                return {
+                    day: dayName,
+                    duration: duration,
+                    isRest: false,
+                    objective: generateObjective(selected),
+                    exercises: selected
+                };
+            });
+
+            renderDashboardToday();
+            renderCalendarTab();
+        }
+
+        function regenerateCalendar() {
+            generateSmartPlan();
+            alert('¡Tu calendario semanal ha sido actualizado de acuerdo a tus duraciones y objetivos de salud!');
+        }
+
+        // --- DASHBOARD RENDERER ---
+        function renderDashboardToday() {
+            const container = document.getElementById('dashboard-today-exercises');
+            container.innerHTML = '';
+
+            const todayPlan = generatedCalendar.find(d => !d.isRest) || generatedCalendar[0];
+
+            document.getElementById('dashboard-session-objective').textContent = todayPlan.objective;
+
+            if (todayPlan.isRest) {
+                document.getElementById('today-duration-label').textContent = 'Día de descanso programado';
+                container.innerHTML = `
+                    <div class="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+                        <i class="fa-solid fa-bed text-3xl text-slate-400 mb-2"></i>
+                        <h4 class="font-bold text-slate-700">Día de Descanso Activo</h4>
+                        <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">Hoy no hay sesión intensa programada para permitir la regeneración tisular. Te recomendamos un paseo suave de 20 minutos.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            document.getElementById('today-duration-label').textContent = `Duración programada para hoy: ${todayPlan.duration} minutos (${todayPlan.exercises.length} ejercicios)`;
+
+            todayPlan.exercises.forEach((ex) => {
+                const el = document.createElement('div');
+                el.className = 'bg-slate-50 hover:bg-teal-50/50 p-4 rounded-2xl border border-slate-200 transition flex items-center justify-between group cursor-pointer';
+                el.onclick = () => openModal(ex.id);
+                
+                el.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 font-bold flex items-center justify-center text-sm shrink-0">
+                            <i class="fa-solid ${ex.icon}"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm group-hover:text-teal-700 transition">${ex.name}</h4>
+                            <div class="flex items-center space-x-2 text-[11px] text-slate-500 mt-0.5">
+                                <span class="bg-slate-200/70 text-slate-700 px-2 py-0.5 rounded-md font-medium">${ex.zoneName}</span>
+                                <span>• ${ex.level}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-teal-600 font-semibold group-hover:underline hidden sm:inline">Ver Avatar & Guía</span>
+                        <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-teal-600 text-xs"></i>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        // --- CALENDAR TAB RENDERER ---
+        function renderCalendarTab() {
+            const container = document.getElementById('calendar-days-container');
+            container.innerHTML = '';
+
+            generatedCalendar.forEach(dayPlan => {
+                const dayCard = document.createElement('div');
+                
+                if (dayPlan.isRest) {
+                    dayCard.className = 'bg-slate-100/70 rounded-2xl p-4 border border-slate-200 flex flex-col justify-between min-h-[250px] opacity-75';
+                    dayCard.innerHTML = `
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">${dayPlan.day}</span>
+                            <div class="text-center py-6">
+                                <i class="fa-solid fa-couch text-slate-300 text-2xl mb-1"></i>
+                                <span class="text-xs font-semibold text-slate-400 block">Descanso</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 italic leading-tight text-center mt-2">${dayPlan.objective}</p>
+                        </div>
+                    `;
+                } else {
+                    dayCard.className = 'bg-white rounded-2xl p-4 border border-teal-200 shadow-sm flex flex-col justify-between min-h-[250px] hover:border-teal-400 transition';
+                    let exercisesHTML = dayPlan.exercises.map(ex => `
+                        <div onclick="openModal('${ex.id}')" class="bg-teal-50/60 hover:bg-teal-100/70 p-2 rounded-xl text-xs cursor-pointer transition flex items-center justify-between mb-1.5 border border-teal-100">
+                            <span class="font-semibold text-slate-700 truncate mr-1">${ex.name}</span>
+                            <i class="fa-solid fa-eye text-teal-600 text-[10px]"></i>
+                        </div>
+                    `).join('');
+
+                    dayCard.innerHTML = `
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <span class="text-xs font-extrabold text-teal-700 uppercase tracking-wider">${dayPlan.day}</span>
+                                <span class="text-[10px] bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded-full">${dayPlan.duration} min</span>
+                            </div>
+                            
+                            <!-- Objective Badge per day -->
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-2 mb-2">
+                                <span class="text-[9px] font-bold text-teal-700 uppercase block">Objetivo:</span>
+                                <p class="text-[10px] text-slate-600 leading-tight">${dayPlan.objective}</p>
+                            </div>
+
+                            <div class="space-y-1">
+                                ${exercisesHTML}
+                            </div>
+                        </div>
+                        <button onclick="startSpecificDayWorkout('${dayPlan.day}')" class="w-full mt-3 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs py-2 rounded-xl transition flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-play text-[10px]"></i>
+                            <span>Entrenar (${dayPlan.duration}m)</span>
+                        </button>
+                    `;
+                }
+
+                container.appendChild(dayCard);
+            });
+        }
+
+        // --- ACHIEVEMENTS RENDERER ---
+        function renderAchievementsGrid() {
+            const container = document.getElementById('achievements-grid');
+            if(!container) return;
+            container.innerHTML = '';
+
+            let unlockedCount = 0;
+
+            ACHIEVEMENTS_DB.forEach(ach => {
+                const isUnlocked = userProfile.unlockedBadges.includes(ach.id);
+                if(isUnlocked) unlockedCount++;
+
+                const card = document.createElement('div');
+                card.className = `rounded-2xl p-5 border transition flex flex-col justify-between ${isUnlocked ? 'bg-white border-amber-300 shadow-md' : 'bg-slate-100/60 border-slate-200 opacity-60'}`;
+                
+                card.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div class="w-12 h-12 rounded-2xl ${isUnlocked ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30' : 'bg-slate-300 text-slate-500'} flex items-center justify-center text-xl">
+                                <i class="fa-solid ${ach.icon}"></i>
+                            </div>
+                            ${isUnlocked ? '<span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Conseguido 🏆</span>' : '<span class="bg-slate-200 text-slate-600 text-[10px] font-bold px-2.5 py-1 rounded-full">Bloqueado</span>'}
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-base leading-snug">${ach.title}</h4>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">${ach.desc}</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('achievements-unlocked-count').textContent = `${unlockedCount} / ${ACHIEVEMENTS_DB.length}`;
+        }
+
+        // --- EXERCISES LIBRARY FILTER & RENDER ---
+        function renderExercisesGrid(list) {
+            const grid = document.getElementById('exercises-grid');
+            grid.innerHTML = '';
+
+            if (list.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-white rounded-2xl border border-slate-200">
+                        <i class="fa-solid fa-magnifying-glass text-3xl text-slate-300 mb-2"></i>
+                        <p class="text-sm font-semibold text-slate-600">No se encontraron ejercicios con los filtros seleccionados.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.forEach(ex => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl p-5 border border-slate-200 hover:shadow-md hover:border-teal-300 transition flex flex-col justify-between space-y-4';
+                
+                let levelColor = 'bg-emerald-100 text-emerald-800';
+                if (ex.level === 'Intermedio') levelColor = 'bg-amber-100 text-amber-800';
+                if (ex.level === 'Avanzado') levelColor = 'bg-rose-100 text-rose-800';
+
+                card.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-lg">
+                                <i class="fa-solid ${ex.icon}"></i>
+                            </div>
+                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${levelColor}">${ex.level}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">${ex.zoneName}</span>
+                            <h3 class="font-bold text-slate-800 text-base leading-snug">${ex.name}</h3>
+                            <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">${ex.shortDesc}</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <span class="text-[11px] text-teal-600 font-medium">Avatar 2D Animado</span>
+                        <button onclick="openModal('${ex.id}')" class="bg-slate-100 hover:bg-teal-600 hover:text-white text-slate-700 font-bold text-xs px-3 py-1.5 rounded-xl transition flex items-center space-x-1">
+                            <span>Ver Simulación</span>
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterExercises() {
+            const query = document.getElementById('exercise-search').value.toLowerCase();
+            const zone = document.getElementById('filter-zone').value;
+            const level = document.getElementById('filter-level').value;
+            const condition = document.getElementById('filter-condition').value;
+
+            const filtered = EXERCISES_DB.filter(ex => {
+                const matchesSearch = ex.name.toLowerCase().includes(query) || ex.shortDesc.toLowerCase().includes(query);
+                const matchesZone = zone === 'all' || ex.zone === zone;
+                const matchesLevel = level === 'all' || ex.level === level;
+                const matchesCondition = condition === 'all' || ex.conditions.includes(condition);
+
+                return matchesSearch && matchesZone && matchesLevel && matchesCondition;
+            });
+
+            renderExercisesGrid(filtered);
+        }
+
+        // --- EXERCISE MODAL WITH ANIMATED AVATAR ---
+        function openModal(exerciseId) {
+            const ex = EXERCISES_DB.find(item => item.id === exerciseId);
+            if (!ex) return;
+
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = `
+                <!-- Modal Header -->
+                <div class="flex items-start space-x-4 border-b border-slate-100 pb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center text-2xl shrink-0">
+                        <i class="fa-solid ${ex.icon}"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-teal-600 uppercase tracking-wider block">${ex.zoneName} • Nivel ${ex.level}</span>
+                        <h2 class="text-xl font-black text-slate-800">${ex.name}</h2>
+                    </div>
+                </div>
+
+                <!-- ANIMATED HUMAN AVATAR SIMULATION -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-person-walking text-teal-600"></i> Simulación Avatar del Ejercicio
+                    </h4>
+                    ${ex.svgDiagram}
+                </div>
+
+                <!-- Anatomical Target Banner -->
+                <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl p-4 shadow-sm flex items-center space-x-4">
+                    <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-bullseye text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-teal-400">Objetivo Anatómico & Corrector</h4>
+                        <p class="text-xs text-slate-200 mt-0.5">${ex.muscleTargets}</p>
+                    </div>
+                </div>
+
+                <!-- Step-by-step Instructions -->
+                <div>
+                    <h4 class="text-sm font-bold text-slate-800 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-list-ol text-teal-600"></i> Ejecución Correcta
+                    </h4>
+                    <ul class="space-y-2 text-xs text-slate-600">
+                        ${ex.instructions.map(step => `
+                            <li class="flex items-start space-x-2">
+                                <i class="fa-solid fa-check text-teal-500 mt-0.5"></i>
+                                <span>${step}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+
+                <!-- Common Mistakes -->
+                <div class="bg-amber-50 rounded-2xl p-4 border border-amber-200/70">
+                    <h4 class="text-xs font-bold text-amber-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Errores Comunes a Evitar
+                    </h4>
+                    <ul class="space-y-1 text-xs text-amber-900">
+                        ${ex.mistakes.map(m => `<li>• ${m}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <!-- Progression Possibilities -->
+                <div>
+                    <h4 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-teal-600"></i> Niveles de Progresión
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <span class="text-[10px] font-bold text-emerald-600 uppercase block mb-1">Nivel Inicial</span>
+                            <p class="text-[11px] text-slate-600">${ex.progressions.initial}</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <span class="text-[10px] font-bold text-amber-600 uppercase block mb-1">Nivel Intermedio</span>
+                            <p class="text-[11px] text-slate-600">${ex.progressions.intermedio}</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <span class="text-[10px] font-bold text-rose-600 uppercase block mb-1">Nivel Avanzado</span>
+                            <p class="text-[11px] text-slate-600">${ex.progressions.avanzado}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('exercise-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('exercise-modal').classList.add('hidden');
+        }
+
+        // --- WORKOUT PLAYER & CHRONOMETER ENGINE ---
+        let currentWorkoutList = [];
+        let currentWorkoutIndex = 0;
+        let currentSessionDuration = 30;
+
+        function startTodayWorkout() {
+            const todayPlan = generatedCalendar.find(d => !d.isRest) || generatedCalendar[0];
+            if (!todayPlan || todayPlan.isRest || todayPlan.exercises.length === 0) {
+                alert('Hoy es un día de descanso activo programado. ¡Disfruta tu recuperación!');
+                return;
+            }
+            currentWorkoutList = todayPlan.exercises;
+            currentWorkoutIndex = 0;
+            currentSessionDuration = todayPlan.duration;
+            
+            document.getElementById('workout-session-objective').textContent = todayPlan.objective;
+
+            loadWorkoutExercise();
+            document.getElementById('workout-modal').classList.remove('hidden');
+        }
+
+        function startSpecificDayWorkout(dayName) {
+            const dayPlan = generatedCalendar.find(d => d.day === dayName);
+            if (!dayPlan || dayPlan.isRest) return;
+            currentWorkoutList = dayPlan.exercises;
+            currentWorkoutIndex = 0;
+            currentSessionDuration = dayPlan.duration;
+            
+            document.getElementById('workout-session-objective').textContent = dayPlan.objective;
+
+            loadWorkoutExercise();
+            document.getElementById('workout-modal').classList.remove('hidden');
+        }
+
+        function loadWorkoutExercise() {
+            const ex = currentWorkoutList[currentWorkoutIndex];
+            document.getElementById('workout-progress-counter').textContent = `Ejercicio ${currentWorkoutIndex + 1} de ${currentWorkoutList.length}`;
+            document.getElementById('workout-ex-name').textContent = ex.name;
+            document.getElementById('workout-ex-desc').textContent = ex.shortDesc;
+            document.getElementById('workout-ex-focus').textContent = ex.muscleTargets;
+            document.getElementById('workout-svg-graphic').innerHTML = ex.svgDiagram;
+
+            // Reset Chronometer for the new exercise
+            resetChronometer();
+        }
+
+        // CHRONOMETER LOGIC
+        function toggleChronometer() {
+            if (chronoRunning) {
+                clearInterval(chronoTimer);
+                chronoRunning = false;
+                document.getElementById('chrono-toggle-icon').className = 'fa-solid fa-play';
+            } else {
+                chronoRunning = true;
+                document.getElementById('chrono-toggle-icon').className = 'fa-solid fa-pause';
+                chronoTimer = setInterval(() => {
+                    if (chronoSeconds > 0) {
+                        chronoSeconds--;
+                        updateChronoDisplay();
+                    } else {
+                        clearInterval(chronoTimer);
+                        chronoRunning = false;
+                        document.getElementById('chrono-toggle-icon').className = 'fa-solid fa-play';
+                        alert('¡Tiempo de serie completado! Tómate 20 segundos de descanso antes de la siguiente.');
+                        resetChronometer();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetChronometer() {
+            clearInterval(chronoTimer);
+            chronoRunning = false;
+            chronoSeconds = 45; // Default set duration
+            updateChronoDisplay();
+            document.getElementById('chrono-toggle-icon').className = 'fa-solid fa-play';
+        }
+
+        function updateChronoDisplay() {
+            const mins = Math.floor(chronoSeconds / 60);
+            const secs = chronoSeconds % 60;
+            document.getElementById('chrono-display').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function nextWorkoutExercise() {
+            resetChronometer();
+            if (currentWorkoutIndex < currentWorkoutList.length - 1) {
+                currentWorkoutIndex++;
+                loadWorkoutExercise();
+            } else {
+                userProfile.completedWorkoutsCount++;
+                userProfile.totalMinutesTrained += currentSessionDuration;
+                userProfile.streakDays++;
+
+                checkAchievementsUnlock();
+
+                saveProfileToStorage();
+                updateUIProfileHeader();
+                renderAchievementsGrid();
+
+                alert(`¡Felicidades! Has completado tu sesión de ${currentSessionDuration} minutos. ¡Suma 1 día a tu racha y acumulas nuevos minutos de postura saludable!`);
+                closeWorkoutModal();
+            }
+        }
+
+        function checkAchievementsUnlock() {
+            ACHIEVEMENTS_DB.forEach(ach => {
+                if(!userProfile.unlockedBadges.includes(ach.id)) {
+                    if(ach.reqType === 'workouts' && userProfile.completedWorkoutsCount >= ach.reqVal) {
+                        userProfile.unlockedBadges.push(ach.id);
+                    }
+                    if(ach.reqType === 'streak' && userProfile.streakDays >= ach.reqVal) {
+                        userProfile.unlockedBadges.push(ach.id);
+                    }
+                    if(ach.reqType === 'minutes' && userProfile.totalMinutesTrained >= ach.reqVal) {
+                        userProfile.unlockedBadges.push(ach.id);
+                    }
+                }
+            });
+        }
+
+        function closeWorkoutModal() {
+            resetChronometer();
+            document.getElementById('workout-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
